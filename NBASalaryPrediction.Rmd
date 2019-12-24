@@ -1,0 +1,58 @@
+---
+title: "NBA Salary Prediction"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r cars}
+library(tidyverse)
+library(readxl)
+library(NBAloveR)
+
+salary <- read_excel("~/Emory/Advanced Mangerial Econ & Data Analytics/Data/NBA metrics plus salary.xlsx")
+injuries <- read.csv("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/nba-injuries-2010-2018/injuries.csv")
+capspace <- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/TeamCapSpace.xlsx")
+allnbateam <- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/AllNBATeam.xlsx")
+
+```
+
+## Data Prep
+
+```{r pressure, echo=FALSE}
+
+injuriessum <-
+  injuries %>%
+  filter(!is.na(Team)) %>%
+  count(Relinquised) %>%
+  arrange(desc(n))
+
+salarycombined <-
+  salary %>%
+  left_join(injuriessum, by = c("Player" = "Relinquised"))
+
+```
+
+##Get Data from NBAloveR
+
+```{r}
+Kobe <- 
+  players %>%
+  group_by(Player) %>%
+  top_n(1,Year) %>%
+  mutate(numberofseasons = Year - RookieYear) %>%
+  filter(Player =="Kobe Bryant")
+Kobe
+```
+
+
+```{r}
+head(franchise)
+```
+
+
+
