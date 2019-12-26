@@ -13,11 +13,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
 library(NBAloveR)
+library(knitr)
 
 salary <- read_excel("~/Emory/Advanced Mangerial Econ & Data Analytics/Data/NBA metrics plus salary.xlsx")
 injuries <- read.csv("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/nba-injuries-2010-2018/injuries.csv")
 capspace <- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/TeamCapSpace.xlsx")
 allnbateam <- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/AllNBATeam.xlsx")
+awards<- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/awards-consolidated.xlsx")
+salary2016<- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/2016 Salaries.xlsx")
 
 ```
 
@@ -29,11 +32,69 @@ injuriessum <-
   injuries %>%
   filter(!is.na(Team)) %>%
   count(Relinquised) %>%
-  arrange(desc(n))
+  rename("numberofinjuries" = "n") 
+
+awardtotal <-
+  awards %>%
+  # filter(Award == "MVP") %>%
+  count(PLAYER ) %>%
+  rename("numberofawards" = "n") 
+  
+mvp <-
+  awards %>%
+  filter(Award == "MVP") %>%
+  count(PLAYER ) %>%
+  rename("mvp" = "n")
+roty <-
+  awards %>%
+  filter(Award == "ROTY") %>%
+  count(PLAYER ) %>%
+  rename("roty" = "n") 
+dpoty <-
+  awards %>%
+  filter(Award == "DPOTY") %>%
+  count(PLAYER ) %>%
+  rename("dpoty" = "n") 
+sixth <-
+  awards %>%
+  filter(Award == "Sixth Man") %>%
+  count(PLAYER ) %>%
+  rename("sixthman" = "n") 
+
+finalsmvp <-
+  awards %>%
+  filter(Award == "Finals MVP") %>%
+  count(PLAYER ) %>%
+  rename("finalsmvp" = "n") 
+
+Seasons <- 
+  players %>%
+  group_by(Player) %>%
+  top_n(1,Year) %>%
+  mutate(numberofseasons = Year - RookieYear) 
+
+prioriyearsal <-
+  salary2016 %>%
+  group_by(`Player Name`) %>%
+  summarise(PriorYear = sum(`Salary in $`))
 
 salarycombined <-
   salary %>%
-  left_join(injuriessum, by = c("Player" = "Relinquised"))
+  left_join(injuriessum, by = c("Player" = "Relinquised")) %>%
+  left_join(Seasons, by = c("Player" = "Player")) %>%
+  left_join(awardtotal, by = c("Player" = "PLAYER")) %>%
+  left_join(mvp, by = c("Player" = "PLAYER")) %>%
+  left_join(roty, by = c("Player" = "PLAYER")) %>%
+  left_join(dpoty, by = c("Player" = "PLAYER")) %>%
+  left_join(sixth, by = c("Player" = "PLAYER")) %>%
+  left_join(finalsmvp, by = c("Player" = "PLAYER")) %>%
+  left_join(prioriyearsal, by = c("Player" = "Player Name")) 
+
+  # filter("Year" =="RookieYear") 
+  # kable()
+# seasons
+# kable()
+
 
 ```
 
@@ -45,13 +106,31 @@ Kobe <-
   group_by(Player) %>%
   top_n(1,Year) %>%
   mutate(numberofseasons = Year - RookieYear) %>%
-  filter(Player =="Kobe Bryant")
+  # filter(Player =="Stephen Curry") %>%
+  kable()
 Kobe
+head(players)
+# kable()
 ```
 
+##Model
 
 ```{r}
-head(franchise)
+ModelNBA <- lm(Salary
+              ~ numberofseasons 
+              + PriorYear
+              # + ExpSq
+              # + ed
+              # + race
+              # + sex
+              # + race_black
+              # + race_hispanic
+              # + race_other
+              # + age
+              , data = salarycombined)
+
+summary(ModelNBA) 
+
 ```
 
 
