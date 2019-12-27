@@ -15,12 +15,12 @@ library(readxl)
 library(NBAloveR)
 library(knitr)
 
-salary <- read_excel("~/Emory/Advanced Mangerial Econ & Data Analytics/Data/NBA metrics plus salary.xlsx")
-injuries <- read.csv("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/nba-injuries-2010-2018/injuries.csv")
-capspace <- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/TeamCapSpace.xlsx")
-allnbateam <- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/AllNBATeam.xlsx")
-awards<- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/awards-consolidated.xlsx")
-salary2016<- read_excel("C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/2016 Salaries.xlsx")
+salary <- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/NBA metrics plus salary_with var notes.csv")
+injuries <- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/injuries.csv")
+capspace <- read_excel("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/TeamCapSpace.xlsx")
+allnbateam <- read_excel("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/AllNBATeam.xlsx")
+awards<- read_excel("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/awards-consolidated.xlsx")
+salary2016<- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/2016 Salaries.csv")
 
 ```
 
@@ -75,8 +75,8 @@ Seasons <-
 
 prioriyearsal <-
   salary2016 %>%
-  group_by(`Player Name`) %>%
-  summarise(PriorYear = sum(`Salary in $`))
+  group_by(`Player.Name`) %>%
+  summarise(PriorYear = sum(`Salary.in..`))
 
 salarycombined <-
   salary %>%
@@ -88,7 +88,7 @@ salarycombined <-
   left_join(dpoty, by = c("Player" = "PLAYER")) %>%
   left_join(sixth, by = c("Player" = "PLAYER")) %>%
   left_join(finalsmvp, by = c("Player" = "PLAYER")) %>%
-  left_join(prioriyearsal, by = c("Player" = "Player Name")) 
+  left_join(prioriyearsal, by = c("Player" = "Player.Name")) 
 
   # filter("Year" =="RookieYear") 
   # kable()
