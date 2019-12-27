@@ -14,6 +14,8 @@ library(tidyverse)
 library(readxl)
 library(NBAloveR)
 library(knitr)
+library(corrplot)
+library(stargazer)
 
 salary <- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/NBA metrics plus salary_with var notes.csv")
 injuries <- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/injuries.csv")
@@ -44,7 +46,7 @@ mvp <-
   awards %>%
   filter(Award == "MVP") %>%
   count(PLAYER ) %>%
-  rename("mvp" = "n")
+  rename("mvp" = "n") 
 roty <-
   awards %>%
   filter(Award == "ROTY") %>%
@@ -98,38 +100,142 @@ salarycombined <-
 
 ```
 
-##Get Data from NBAloveR
+##Subset Data Based on Player Position - Players without salary from prior year removed
 
 ```{r}
-Kobe <- 
-  players %>%
-  group_by(Player) %>%
-  top_n(1,Year) %>%
-  mutate(numberofseasons = Year - RookieYear) %>%
-  # filter(Player =="Stephen Curry") %>%
-  kable()
-Kobe
-head(players)
-# kable()
+
+allpositions <-
+  salarycombined %>%
+  # filter(PriorYear == "NA") %>%
+  mutate_at(vars(mvp,roty,dpoty,sixthman,finalsmvp,Salary,Guaranteed,numberofawards,numberofinjuries), ~replace_na(., 0)) %>%
+  drop_na(PriorYear,X3PAr)
+
+center <-
+  allpositions %>%
+  filter(Pos.x == "C") 
+powerforward <-
+  allpositions %>%
+  filter(Pos.x == "PF")
+shootingguard <-
+  allpositions %>%
+  filter(Pos.x == "SG")
+pointguard <-
+  allpositions %>%
+  filter(Pos.x == "PG")
+smallforward <-
+  allpositions %>%
+  filter(Pos.x == "SF")
+
+
 ```
+
+##Correlation Matrix
+
+```{r}
+# 
+# salarynumeric <- select(salarycombined,c(mvp,roty,dpoty,sixthman,finalsmvp,Salary,Guaranteed,numberofawards,numberofinjuries))
+# 
+# salarynumeric[is.na(salarynumeric)] = 0
+
+correlationall <- select(allpositions,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- cor(correlationall)
+# png(file="corr.png", res=300, width=4500, height=4500)
+corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "All Positions", mar=c(0,0,1,0))
+
+correlationcenter <- select(center,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- cor(correlationcenter)
+# png(file="corr.png", res=300, width=4500, height=4500)
+corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "Centers", mar=c(0,0,1,0))
+
+correlationpf <- select(powerforward,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- cor(correlationpf)
+# png(file="corr.png", res=300, width=4500, height=4500)
+corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "Power Forwards", mar=c(0,0,1,0))
+
+correlationsg <- select(shootingguard,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- cor(correlationsg)
+# png(file="corr.png", res=300, width=4500, height=4500)
+corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "Shooting Guards", mar=c(0,0,1,0))
+
+correlationpg <- select(pointguard,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- cor(correlationpg)
+# png(file="corr.png", res=300, width=4500, height=4500)
+corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "Point Guards", mar=c(0,0,1,0))
+
+correlationsf <- select(smallforward,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- cor(correlationsf)
+# png(file="corr.png", res=300, width=4500, height=4500)
+corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "Small Forwards", mar=c(0,0,1,0))
+
+
+
+# correlationnumberic <- na.omit(allpositions)
+# M2 <- cor(correlationall)
+# # png(file="corr.png", res=300, width=4500, height=4500)
+# corrplot(cor(M2), method = "shade", number.cex = 1, tl.cex = 1, title = "All Positions", mar=c(0,0,1,0))
+
+
+# write.csv(salaryawards,"C:/Users/antbru/OneDrive - eVestment/New folder/Temp/To be deleted/export.csv")
+
+```
+
 
 ##Model
 
 ```{r}
-ModelNBA <- lm(Salary
-              ~ numberofseasons 
+Modelall <- lm(Salary
+              ~ VORP 
               + PriorYear
-              # + ExpSq
-              # + ed
-              # + race
-              # + sex
-              # + race_black
-              # + race_hispanic
-              # + race_other
-              # + age
-              , data = salarycombined)
+              , data = allpositions)
 
-summary(ModelNBA) 
+Modelcenter <- lm(Salary
+              ~ VORP 
+              + PriorYear
+              + dpoty
+              + MP
+              + DWS
+              + numberofinjuries
+              , data = center)
+
+Modelpf <- lm(Salary
+              ~ VORP 
+              + PriorYear
+              + numberofawards
+              + numberofseasons
+              , data = powerforward)
+
+Modelsg <- lm(Salary
+              ~ VORP
+              + PriorYear
+              + WS
+              + AST.
+              + numberofseasons
+              , data = shootingguard)
+
+Modelpg <- lm(Salary
+              ~ VORP 
+              + PriorYear
+              + numberofseasons
+              + MP
+              + mvp
+              , data = pointguard)
+
+Modelsf <- lm(Salary
+              ~ VORP
+              + PriorYear
+              + OWS
+              + WS
+              + numberofseasons
+              , data = smallforward)
+
+
+summary(Modelall)
+summary(Modelcenter)
+summary(Modelpf)
+summary(Modelsg)
+summary(Modelpg)
+summary(Modelsf)
+# stargazer(Modelall,Modelcenter, type = "html")
 
 ```
 
