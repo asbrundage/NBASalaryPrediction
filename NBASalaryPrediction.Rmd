@@ -123,7 +123,9 @@ allpositions <-
   drop_na(PriorYear,X3PAr)
 
 allpositions$exp <-allpositions$Age.x - allpositions$numberofseasons - 5
-allpositions$expsqd <- allpositions$exp^2
+
+#run the below line individually
+allpositions$expsqd <- allpositions$exp^2 
 
 # 
 # center <-
