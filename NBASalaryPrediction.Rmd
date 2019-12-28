@@ -17,12 +17,12 @@ library(knitr)
 library(corrplot)
 library(stargazer)
 
-salary <- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/NBA metrics plus salary_with var notes.csv")
-injuries <- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/injuries.csv")
-capspace <- read_excel("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/TeamCapSpace.xlsx")
-allnbateam <- read_excel("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/AllNBATeam.xlsx")
-awards<- read_excel("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/awards-consolidated.xlsx")
-salary2016<- read.csv("C:/Users/antbru/Documents/GitHub/NBASalaryPrediction/data/2016 Salaries.csv")
+salary <- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/NBA metrics plus salary_with var notes.csv")
+injuries <- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/injuries.csv")
+capspace <- read_excel("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/TeamCapSpace.xlsx")
+allnbateam <- read_excel("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/AllNBATeam.xlsx")
+awards<- read_excel("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/awards-consolidated.xlsx")
+salary2016<- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/2016 Salaries.csv")
 
 ```
 
@@ -110,6 +110,9 @@ allpositions <-
   mutate_at(vars(mvp,roty,dpoty,sixthman,finalsmvp,Salary,Guaranteed,numberofawards,numberofinjuries), ~replace_na(., 0)) %>%
   drop_na(PriorYear,X3PAr)
 
+allpositions$exp <-allpositions$Age.x - allpositions$numberofseasons - 5
+allpositions$expsqd < - (allpositions$Age.x - allpositions$numberofseasons - 5)^2
+
 center <-
   allpositions %>%
   filter(Pos.x == "C") 
@@ -184,57 +187,58 @@ corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "Small Forward
 
 ```{r}
 Modelall <- lm(Salary
-              ~ VORP 
-              + PriorYear
+              ~ numberofseasons 
+              + exp
+              + expsqd
               , data = allpositions)
 
-Modelcenter <- lm(Salary
-              ~ VORP 
-              + PriorYear
-              + dpoty
-              + MP
-              + DWS
-              + numberofinjuries
-              , data = center)
-
-Modelpf <- lm(Salary
-              ~ VORP 
-              + PriorYear
-              + numberofawards
-              + numberofseasons
-              , data = powerforward)
-
-Modelsg <- lm(Salary
-              ~ VORP
-              + PriorYear
-              + WS
-              + AST.
-              + numberofseasons
-              , data = shootingguard)
-
-Modelpg <- lm(Salary
-              ~ VORP 
-              + PriorYear
-              + numberofseasons
-              + MP
-              + mvp
-              , data = pointguard)
-
-Modelsf <- lm(Salary
-              ~ VORP
-              + PriorYear
-              + OWS
-              + WS
-              + numberofseasons
-              , data = smallforward)
+# Modelcenter <- lm(Salary
+#               ~ VORP 
+#               + PriorYear
+#               + dpoty
+#               + MP
+#               + DWS
+#               + numberofinjuries
+#               , data = center)
+# 
+# Modelpf <- lm(Salary
+#               ~ VORP 
+#               + PriorYear
+#               + numberofawards
+#               + numberofseasons
+#               , data = powerforward)
+# 
+# Modelsg <- lm(Salary
+#               ~ VORP
+#               + PriorYear
+#               + WS
+#               + AST.
+#               + numberofseasons
+#               , data = shootingguard)
+# 
+# Modelpg <- lm(Salary
+#               ~ VORP 
+#               + PriorYear
+#               + numberofseasons
+#               + MP
+#               + mvp
+#               , data = pointguard)
+# 
+# Modelsf <- lm(Salary
+#               ~ VORP
+#               + PriorYear
+#               + OWS
+#               + WS
+#               + numberofseasons
+#               , data = smallforward)
 
 
 summary(Modelall)
-summary(Modelcenter)
-summary(Modelpf)
-summary(Modelsg)
-summary(Modelpg)
-summary(Modelsf)
+# summary(Modelcenter)
+# summary(Modelpf)
+# summary(Modelsg)
+# summary(Modelpg)
+# summary(Modelsf)
 # stargazer(Modelall,Modelcenter, type = "html")
 
 ```
