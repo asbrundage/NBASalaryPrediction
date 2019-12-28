@@ -118,12 +118,9 @@ salarycombined$international <- as.integer(as.logical(salarycombined$internation
 allpositions <-
   salarycombined %>%
   mutate_at(vars(mvp,roty,dpoty,sixthman,finalsmvp,Salary,Guaranteed,numberofawards,numberofinjuries,highschool,international), ~replace_na(., 0)) %>%
-
-
   drop_na(PriorYear,X3PAr)
 
 allpositions$exp <-allpositions$Age.x - allpositions$numberofseasons - 5
-
 #run the below line individually
 allpositions$expsqd <- allpositions$exp^2 
 
@@ -155,8 +152,10 @@ allpositions$expsqd <- allpositions$exp^2
 # 
 # salarynumeric[is.na(salarynumeric)] = 0
 
-correlationall <- select(allpositions,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
-M <- cor(correlationall)
+correlationall <- 
+  select(allpositions,-c(Player,NBA_Country,Signed.Using,Pos.x,Tm,Pos.y,HT,WT,Teams,PreDraftTeam,Draft.Status,Nationality,Age.y))
+M <- 
+  cor(correlationall)
 # png(file="corr.png", res=300, width=4500, height=4500)
 corrplot(M, method = "shade", number.cex = 1, tl.cex = 1, title = "All Positions", mar=c(0,0,1,0))
 
