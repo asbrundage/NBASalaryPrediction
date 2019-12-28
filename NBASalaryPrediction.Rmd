@@ -170,6 +170,13 @@ Modelall <- lm(Salary
               ~ numberofseasons 
               + exp
               + expsqd
+              + MP
+              + PER
+              + VORP
+              + numberofinjuries
+              # + Tot
+              + PriorYear
+              # + highschool
               , data = allpositions)
 
 # Modelcenter <- lm(Salary
@@ -222,6 +229,3 @@ summary(Modelall)
 # stargazer(Modelall,Modelcenter, type = "html")
 
 ```
-
-
-
