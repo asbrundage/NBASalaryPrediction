@@ -92,7 +92,8 @@ salarycombined <-
   left_join(sixth, by = c("Player" = "PLAYER")) %>%
   left_join(finalsmvp, by = c("Player" = "PLAYER")) %>%
   left_join(prioriyearsal, by = c("Player" = "Player.Name")) %>%
-  left_join(allnbateam, by = c("Player" = "Player")) 
+  left_join(allnbateam, by = c("Player" = "Player")) %>%
+  rename("Totalallnbateam" = "Tot...3")
 # %>%
 #   mutate(highschool = str_detect(players$PreDraftTeam, "School"))
 
@@ -118,7 +119,7 @@ salarycombined$international <- as.integer(as.logical(salarycombined$internation
 
 allpositions <-
   salarycombined %>%
-  mutate_at(vars(mvp,roty,dpoty,sixthman,finalsmvp,Salary,Guaranteed,numberofawards,numberofinjuries,highschool,international,PriorYear,X3PAr,numberofseasons,Tot...3,"1st","2nd","3rd"), ~replace_na(., 0)) 
+  mutate_at(vars(mvp,roty,dpoty,sixthman,finalsmvp,Salary,Guaranteed,numberofawards,numberofinjuries,highschool,international,PriorYear,X3PAr,numberofseasons,Totalallnbateam,"1st","2nd","3rd"), ~replace_na(., 0)) 
 # %>%
   # drop_na(PriorYear,X3PAr,numberofseasons)
 
@@ -176,7 +177,7 @@ Modelall <- lm(Salary
               + PER
               + VORP
               + numberofinjuries
-              # + Tot...3
+              + Totalallnbateam
               + PriorYear
               # + highschool
               , data = allpositions)
@@ -185,7 +186,7 @@ Modelallv2 <- lm(Salary ~
                + exp
                + expsqd
                + numberofseasons
-               
+               + Totalallnbateam
                , data = allpositions)
 
 # Modelcenter <- lm(Salary
