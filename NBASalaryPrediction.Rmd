@@ -260,6 +260,17 @@ allpositions <-
 
 ```{r}
 
+data.frame(R2 = R2(allpositions$predictsalary,allpositions$Salary), RMSE = RMSE(allpositions$predictsalary,allpositions$Salary), MAE = MAE(allpositions$predictsalary,allpositions$Salary))
+
+data.frame(R2 = R2(allpositions$predictsalaryv2,allpositions$Salary), RMSE = RMSE(allpositions$predictsalaryv2,allpositions$Salary), MAE = MAE(allpositions$predictsalaryv2,allpositions$Salary))
+
+```
+
+
+##View Predictions
+
+```{r}
+
 PlayerPrediction <-
   allpositions %>%
   select(Player,numberofseasons,exp,expsqd,MP,PER,VORP,numberofinjuries,Salary,PriorYear,predictsalary,predictsalaryv2) %>%
