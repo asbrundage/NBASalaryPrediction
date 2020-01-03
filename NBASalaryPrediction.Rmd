@@ -17,6 +17,7 @@ library(knitr)
 library(corrplot)
 library(stargazer)
 library(caret)
+library(plotly)
 
 salary <- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/NBA metrics plus salary_with var notes.csv")
 injuries <- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/injuries.csv")
@@ -189,50 +190,35 @@ Modelallv2 <- lm(Salary ~
                + Totalallnbateam
                , data = allpositions)
 
-# Modelcenter <- lm(Salary
-#               ~ VORP 
-#               + PriorYear
-#               + dpoty
-#               + MP
-#               + DWS
-#               + numberofinjuries
-#               , data = center)
-# 
-# Modelpf <- lm(Salary
-#               ~ VORP 
-#               + PriorYear
-#               + numberofawards
-#               + numberofseasons
-#               , data = powerforward)
-# 
-# Modelsg <- lm(Salary
-#               ~ VORP
-#               + PriorYear
-#               + WS
-#               + AST.
-#               + numberofseasons
-#               , data = shootingguard)
-# 
-# Modelpg <- lm(Salary
-#               ~ VORP 
-#               + PriorYear
-#               + numberofseasons
-#               + MP
-#               + mvp
-#               , data = pointguard)
-# 
-# Modelsf <- lm(Salary
-#               ~ VORP
-#               + PriorYear
-#               + OWS
-#               + WS
-#               + numberofseasons
-#               , data = smallforward)
-
+Modelallv3 <- lm(Salary ~
+               + exp
+               + expsqd
+               + numberofseasons
+               + MP
+               + Totalallnbateam
+               + numberofinjuries
+               + Totalallnbateam
+               + VORP
+               + Signed.Using
+               , data = allpositions)
+Modelallv4 <- lm(Salary
+              ~ numberofseasons 
+              + exp
+              + expsqd
+              + MP
+              + PER
+              + VORP
+              + numberofinjuries
+              + Totalallnbateam
+              + PriorYear
+              + Signed.Using
+              # + highschool
+              , data = allpositions)
 
 summary(Modelall)
 summary(Modelallv2)
-# summary(Modelpf)
+summary(Modelallv3)
+summary(Modelallv4)
 # summary(Modelsg)
 # summary(Modelpg)
 # summary(Modelsf)
@@ -252,7 +238,9 @@ summary(Modelallv2)
 allpositions <-
   allpositions %>%
   mutate(predictsalary = predict(Modelall,data = allpositions)) %>%
-  mutate(predictsalaryv2 = predict(Modelallv2, data = allpositions))
+  mutate(predictsalaryv2 = predict(Modelallv2, data = allpositions)) %>%
+  mutate(predictsalaryv3 = predict(Modelallv3, data = allpositions)) %>%
+  mutate(predictsalaryv4 = predict(Modelallv4, data = allpositions))
 
 ```
 
@@ -264,6 +252,19 @@ data.frame(R2 = R2(allpositions$predictsalary,allpositions$Salary), RMSE = RMSE(
 
 data.frame(R2 = R2(allpositions$predictsalaryv2,allpositions$Salary), RMSE = RMSE(allpositions$predictsalaryv2,allpositions$Salary), MAE = MAE(allpositions$predictsalaryv2,allpositions$Salary))
 
+
+data.frame(R2 = R2(allpositions$predictsalaryv3,allpositions$Salary), RMSE = RMSE(allpositions$predictsalaryv3,allpositions$Salary), MAE = MAE(allpositions$predictsalaryv3,allpositions$Salary))
+
+
+data.frame(R2 = R2(allpositions$predictsalaryv4,allpositions$Salary), RMSE = RMSE(allpositions$predictsalaryv4,allpositions$Salary), MAE = MAE(allpositions$predictsalaryv4,allpositions$Salary))
+# 
+# test <-
+#   allpositions %>%
+#   R2(predictsalary, Salary)
+# 
+# test
+# RMSE()
+
 ```
 
 
@@ -273,14 +274,30 @@ data.frame(R2 = R2(allpositions$predictsalaryv2,allpositions$Salary), RMSE = RMS
 
 PlayerPrediction <-
   allpositions %>%
-  select(Player,numberofseasons,exp,expsqd,MP,PER,VORP,numberofinjuries,Salary,PriorYear,predictsalary,predictsalaryv2) %>%
+  select(Player,numberofseasons,exp,expsqd,MP,PER,VORP,numberofinjuries,Salary,PriorYear,predictsalary,predictsalaryv2,predictsalaryv3,predictsalaryv4) %>%
   filter(Player %in% c("Serge Ibaka", "Al Horford","Darren Collison","Dennis Schroder","Andre Iguodala","Kawhi Leonard","Tony Parker","Lonzo Ball"))
-PlayerPrediction
+kable(PlayerPrediction)
 # write.csv(players, file = "C:/Users/asbru/Documents/Emory/Advanced Mangerial Econ & Data Analytics/Assignment 1/nbalover.csv")
 
 # player <-
 #   players %>%
 #   filter(Player %in% c("Serge Ibaka", "Al Horford","Darren Collinson","Dennis Schroder","Andrea Iguodala","Kwahi Leonard","Tony Parker","Lonzo Ball"))
 # player
+```
+
+
+##Graph
+
+
+```{r}
+
+actualvpred <-
+  PlayerPrediction %>%
+  ggplot(aes(x = Salary, y = predictsalary), color = Player) +
+  geom_point() +
+  geom_smooth(method = lm)
+
+ggplotly(actualvpred)
+
 ```
 
