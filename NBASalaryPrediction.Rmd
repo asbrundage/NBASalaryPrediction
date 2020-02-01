@@ -18,6 +18,7 @@ library(corrplot)
 library(stargazer)
 library(caret)
 library(plotly)
+library(ggthemes)
 
 salary <- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/NBA metrics plus salary_with var notes.csv")
 injuries <- read.csv("C:/Users/asbru/Documents/GitHub/NBASalaryPrediction/data/injuries.csv")
@@ -293,9 +294,10 @@ kable(PlayerPrediction)
 
 actualvpred <-
   PlayerPrediction %>%
-  ggplot(aes(x = Salary, y = predictsalary), color = Player) +
-  geom_point() +
-  geom_smooth(method = lm)
+  ggplot(aes(x = Salary, y = predictsalaryv4 )) +
+  geom_point(aes(color = PlayerPrediction$Player)) +
+  geom_smooth(method = lm) +
+  theme_economist_white()
 
 ggplotly(actualvpred)
 
